@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Test autocorregible de Sistemas de Medida y Regulación, temas 1 y 2.">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Test SMR Temas 1 y 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: hoja de prueba de instrumentación. Cabecera con un indicador 4-20 mA como sello, pestañas fijas, una columna de preguntas tipo Aula Virtual, resultados arriba */
+:root{
+  --bg:#f2f4f5; --paper:#ffffff; --ink:#16202a; --muted:#5a6672; --line:#d6dde2;
+  --accent:#0d6280; --accent-soft:#e0edf2; --amber:#a86400; --amber-soft:#fbefdc;
+  --ok:#23784a; --ok-soft:#e0f1e6; --bad:#b2362c; --bad-soft:#f8e2df;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1418; --paper:#172027; --ink:#e2e8ec; --muted:#95a3ad; --line:#2a3640;
+  --accent:#62b7d6; --accent-soft:#163240; --amber:#e3a744; --amber-soft:#3a2b12;
+  --ok:#6cc890; --ok-soft:#163424; --bad:#ef8076; --bad-soft:#3b1d1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1418; --paper:#172027; --ink:#e2e8ec; --muted:#95a3ad; --line:#2a3640;
+  --accent:#62b7d6; --accent-soft:#163240; --amber:#e3a744; --amber-soft:#3a2b12;
+  --ok:#6cc890; --ok-soft:#163424; --bad:#ef8076; --bad-soft:#3b1d1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:800px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{padding-block:24px 14px}
+.head{display:flex;gap:16px;align-items:center}
+.head svg{flex:none}
+.eyebrow{font:600 12px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,5.5vw,40px);line-height:1.05;margin:2px 0 6px;text-wrap:balance}
+.lead{margin:0;color:var(--muted);max-width:62ch;font-size:15px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:4px;padding-block:8px;overflow-x:auto}
+.tab{font:600 15px var(--f-body);background:none;border:0;color:var(--muted);padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.tab:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,.opt:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:18px 48px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:14px;display:grid;gap:12px}
+.ctrls{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:end}
+.field{display:grid;gap:4px;font-size:13px;color:var(--muted);font-weight:500}
+select,.num input{font:500 15px var(--f-body);padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.chk input{accent-color:var(--accent)}
+.btn{font:600 15px var(--f-body);padding:9px 16px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+.btn.sec{background:var(--paper);color:var(--accent)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:12px}
+.q-h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.q-n{font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tag{font:600 11px var(--f-body);padding:2px 8px;border-radius:99px;background:var(--amber-soft);color:var(--amber)}
+.q-t{font-weight:600;margin:6px 0 4px}
+.q-i{font-size:13px;color:var(--muted);margin:0 0 10px}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:5px;accent-color:var(--accent);flex:none}
+.opt .l{font:600 14px var(--f-mono);color:var(--muted);flex:none;width:1.4em}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt.miss{border:2px dashed var(--ok)}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:var(--bg)}
+.row span{min-width:0}
+.row.right{background:var(--ok-soft);border-color:var(--ok)} .row.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.row small{grid-column:1/-1;color:var(--muted)}
+.num{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.num input{width:150px;font-family:var(--f-mono)}
+.num.right input{border-color:var(--ok);background:var(--ok-soft)} .num.wrong input{border-color:var(--bad);background:var(--bad-soft)}
+.fig{margin:4px 0 10px;max-width:340px}
+.fig svg{width:100%;height:auto;display:block}
+.chkb{margin-top:10px}
+.live{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:4;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-top:6px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.live b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.expl{margin-top:10px;font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+.expl.ok{border-color:var(--ok)} .expl.ko{border-color:var(--bad)}
+.expl b{color:var(--ink)}
+.pts{font:600 13px var(--f-mono);margin-left:auto;padding:2px 8px;border-radius:4px}
+.pts.ok{background:var(--ok-soft);color:var(--ok)} .pts.ko{background:var(--bad-soft);color:var(--bad)} .pts.mid{background:var(--amber-soft);color:var(--amber)}
+.score{display:flex;gap:18px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:14px;flex-wrap:wrap}
+.score .n{font:700 48px/1 var(--f-display);min-width:96px;font-variant-numeric:tabular-nums}
+.score .n small{font-size:20px;color:var(--muted)}
+.score>div:last-child{min-width:0;flex:1}
+.pass{color:var(--ok)} .fail{color:var(--bad)}
+.ans{margin:6px 0 0;padding:8px 12px;border-radius:6px;background:var(--ok-soft);font-size:15px}
+.ans ul,.ans ol{margin:0;padding-left:20px}
+h2{font-family:var(--f-display);font-size:26px;margin:24px 0 10px}
+.hist{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+.hist table{border-collapse:collapse;width:100%;font-size:14px}
+.hist th,.hist td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left}
+.hist th{color:var(--muted);font-weight:600}
+.hist td.m{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);font-size:14px;padding:14px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<header>
+  <div class="wrap head">
+    <svg width="64" height="56" viewBox="0 0 64 56" aria-hidden="true">
+      <path d="M6 44 A26 26 0 0 1 58 44" fill="none" stroke="var(--line)" stroke-width="6"/>
+      <path d="M6 44 A26 26 0 0 1 44 21" fill="none" stroke="var(--accent)" stroke-width="6"/>
+      <line x1="32" y1="44" x2="46" y2="24" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="44" r="4" fill="var(--ink)"/>
+      <text x="2" y="55" font-size="8" font-family="IBM Plex Mono,monospace" fill="var(--muted)">4</text>
+      <text x="50" y="55" font-size="8" font-family="IBM Plex Mono,monospace" fill="var(--muted)">20</text>
+    </svg>
+    <div>
+      <div class="eyebrow">Sistemas de Medida y Regulación · Temas 1 y 2</div>
+      <h1>Test de SMR: temas 1 y 2</h1>
+      <p class="lead">Las preguntas de los cuestionarios del Aula Virtual (Tema 1 y las partes I, II y III del Tema 2), con la respuesta del profesor y una explicación corta. Se corrigen nada más contestar.</p>
+    </div>
+  </div>
+</header>
+
+<nav><div class="wrap" role="tablist">
+  <button class="tab" role="tab" id="tab-test" aria-selected="true" data-v="test">Test</button>
+  <button class="tab" role="tab" id="tab-rep" aria-selected="false" data-v="rep">Repasar respuestas</button>
+  <button class="tab" role="tab" id="tab-hist" aria-selected="false" data-v="hist">Mis intentos</button>
+</div></nav>
+
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===================== BANCO =====================
+ t: s = una opción (o[0] correcta, salvo fx:true con c=índice)
+    tf = verdadero/falso (a)
+    m = varias (c = índices correctos)
+    r = relaciona (pairs, ch)
+    o = ordenar (steps en orden correcto)
+    n = numérica (a, u)
+    g = gráfica (g, o[0] correcta)
+ f:1 = la fallaste (o la tuviste a medias) en el Aula Virtual */
+const PARTS={0:"Tema 1 · Introducción a los SMR",1:"Tema 2 · Parte I · Temperatura y conceptos",2:"Tema 2 · Parte II · Galgas, encoders y otros",3:"Tema 2 · Parte III · Acondicionamiento y errores"};
+const SHORT={0:"Tema 1",1:"T2 · Parte I",2:"T2 · Parte II",3:"T2 · Parte III"};
+const Q=[
+/* ---------- TEMA 1 ---------- */
+{id:"T1-1",p:0,t:"m",q:"Respecto de la frecuencia:",o:["Representa el número de veces que se repite la señal en un segundo.","Alcanza un valor estándar de 230 V.","Su valor en Europa es de 60 Hz.","Se mide en hercios."],c:[0,3],e:"Son los ciclos por segundo y se mide en hercios (Hz). En Europa es de 50 Hz (60 Hz en América). Los 230 V son la tensión, no la frecuencia."},
+{id:"T1-2",p:0,t:"r",q:"Empareja las salidas habituales de los siguientes elementos medidores:",pairs:[["Transductor","Analógico"],["Detector","Digital"],["Sonda","Analógico"],["Sensor","Analógico"],["Captador","Digital"]],ch:["Analógico","Digital"],e:"Detector y captador dan valores discretos (todo-nada). Transductor, sonda y sensor dan un valor continuo."},
+{id:"T1-3",p:0,f:1,t:"s",fx:true,c:1,q:"Un variador de frecuencia está sacando 37,5 Hz y a su salida hay conectado un motor trifásico asíncrono de 6 polos magnéticos. ¿A qué velocidad está girando el motor?",o:["1200 rpm","1000 rpm","500 rpm","600 rpm"],e:"El cuestionario da como buena 1000 rpm. Ojo: con la fórmula n = 60·f / p (p = pares de polos = 3) salen 60·37,5/3 = 750 rpm, y 1000 rpm serían a 50 Hz. Si te sale tal cual en el examen, marca 1000 rpm. Si te dan otras opciones, usa la fórmula."},
+{id:"T1-4",p:0,f:1,t:"s",fx:true,c:2,q:"Las ecuaciones que rigen el comportamiento de los sistemas de control son de tipo:",o:["Lineales.","Algebraico.","Ninguna de las respuestas es correcta.","Racionales."],e:"Son ecuaciones diferenciales. Por eso se pasan con Laplace a la función de transferencia G(s)."},
+{id:"T1-5",p:0,t:"s",q:"En el vídeo del flujostato, ¿qué elemento realiza el control?",o:["Interruptor Reed.","Presostato.","Vacuostato.","Control por brecha diferencial."],e:"En el flujostato del vídeo, el contacto lo hace un interruptor Reed, que cierra al acercarse el imán movido por el caudal."},
+{id:"T1-6",p:0,t:"s",q:"Sensor, transductor, captador o sonda forman parte del bloque:",o:["Medidor","Actuador","Planta","Controlador"],e:"Todos miden la variable, así que forman el bloque medidor (la realimentación)."},
+{id:"T1-7",p:0,t:"s",fx:true,c:1,q:"¿Qué tipo de señales comunican los diagramas de bloques que representan un lazo abierto o cerrado?",o:["Neumáticas","Todas las respuestas son correctas","Hidráulicas","Eléctricas y mecánicas"],e:"Las flechas del diagrama pueden ser señales de cualquier tipo: eléctricas, mecánicas, neumáticas o hidráulicas."},
+{id:"T1-8",p:0,t:"s",fx:true,c:3,q:"Un manómetro mide la presión:",o:["Absoluta","Todas las respuestas son correctas","Atmosférica","De trabajo"],e:"Mide la presión relativa (manométrica), que es la de trabajo: la que hay por encima de la atmosférica. La absoluta incluye la atmosférica, y la atmosférica se mide con un barómetro."},
+{id:"T1-9",p:0,t:"r",q:"Empareja los conceptos:",pairs:[["G(s)","Función de transferencia"],["Lazo abierto","OL"],["Setpoint","Consigna"],["Señal analógica","Señal continua"],["Señal discreta","Señal digital"],["Lazo cerrado","CL"]],ch:["Función de transferencia","OL","CL","Consigna","Señal continua","Señal digital"],e:"OL = Open Loop (lazo abierto) y CL = Closed Loop (lazo cerrado). El setpoint es la consigna."},
+{id:"T1-10",p:0,t:"s",q:"Las circunstancias ajenas al proceso que interfieren en él se denominan:",o:["Perturbaciones","Interferencias.","Anomalías.","Alteraciones."],e:"Las perturbaciones, como una cuesta en el control de crucero o tirar de la cadena en la cisterna."},
+{id:"T1-11",p:0,t:"m",q:"A través de la FDT podemos:",o:["Saber si el sistema es adecuado para el trabajo que debe desarrollar.","Determinar si el sistema se comportará de forma estable o inestable.","Predecir el funcionamiento ante una determinada entrada.","Realizar el estudio de su comportamiento"],c:[0,1,2,3],e:"Todas. La FDT (función de transferencia, G(s)) relaciona la salida con la entrada y sirve para estudiar el sistema."},
+{id:"T1-13",p:0,t:"s",fx:true,c:0,q:"El bloque en el que se introduce el valor deseado para un proceso es el:",o:["Ninguna de las respuestas es correcta","Medidor","Actuador","Planta"],e:"El valor deseado (la consigna) se introduce en el selector de consigna o en el controlador, y ninguno está entre las opciones."},
+{id:"T1-14",p:0,t:"s",q:"¿Cuándo actúa un presostato?",o:["Cuando alcanza la presión manométrica establecida.","Cuando alcanza la presión de vacío establecida.","Cuando alcanza la presión absoluta establecida.","Cuando alcanza la presión atmosférica establecida."],e:"Conmuta su contacto al llegar a la presión manométrica ajustada. El que actúa con vacío es el vacuostato."},
+{id:"T1-15",p:0,t:"m",q:"Los controladores todo-nada:",o:["Son sistemas de lazo cerrado","A nivel industrial y doméstico son muy empleados","Son sistemas de lazo abierto","Son muy sencillos"],c:[0,1,3],e:"Miden la variable y conectan o desconectan, como un termostato o un presostato. Hay realimentación, así que son de lazo cerrado."},
+{id:"T1-16",p:0,f:1,t:"r",q:"Empareja los conceptos:",pairs:[["Variable de Proceso","Salida"],["Señal realimentada","Medidor"],["Salida","Variable controlada"],["Actuador","Variable Manipulada"],["Entrada del Comparador","Variable de Proceso"],["Señal de error","Salida del Comparador"]],ch:["Salida","Medidor","Variable controlada","Variable Manipulada","Variable de Proceso","Salida del Comparador"],e:"La salida es la variable controlada, y la variable de proceso (PV) es esa salida medida, que entra al comparador. La señal realimentada sale del medidor, el actuador produce la variable manipulada y la señal de error es la salida del comparador. En el Aula Virtual sacaste solo 0,33."},
+{id:"T1-17",p:0,f:1,t:"r",q:"Marca Verdadero o Falso respecto del conversor de frecuencia:",pairs:[["Su alimentación puede ser monofásica o trifásica","Verdadero"],["Un variador monofásico no puede controlar un motor trifásico","Falso"],["Sólo funciona en CL","Falso"],["Controla velocidad y par del motor","Verdadero"],["Lo habitual es que el VFD esté asociado a motores trifásicos","Verdadero"],["Sólo controla motores monofásicos","Falso"],["Funciona en OL","Verdadero"],["Sólo controla motores trifásicos","Falso"]],ch:["Verdadero","Falso"],e:"Un variador con alimentación monofásica (230 V) puede dar salida trifásica y mover un motor trifásico. Controla la velocidad y el par: esta es la que fallaste. Funciona en lazo abierto, y también en cerrado si se le pone un encoder."},
+{id:"T1-18",p:0,f:1,t:"m",q:"Hablar de industria 4.0 implica:",o:["Variadores de frecuencia","IoT","Dispositivos conectados a Internet.","IIoT","Big Data","Sistemas ciberfísicos","PLC's","HMI"],c:[1,2,3,4,5],e:"Variadores, PLC y HMI ya existían en la industria 3.0 (la automatización). La 4.0 añade la conexión y los datos: IoT, IIoT, Big Data y sistemas ciberfísicos."},
+{id:"T1-19",p:0,t:"s",q:"La respuesta final estable que alcanza un sistema tras un tiempo define a una respuesta:",o:["Permanente","Final","Estable","Fija"],e:"La respuesta permanente es la final y estable. La inicial, que desaparece, es la transitoria."},
+{id:"T1-20",p:0,f:1,t:"m",q:"¿Qué dispositivo se encarga de realizar el control?",o:["Una válvula","Un motor","Un RI","Un PLC"],c:[2,3],e:"El RI (relé inteligente) y el PLC son controladores. La válvula y el motor son actuadores. Te faltó marcar uno de los dos."},
+{id:"T1-21",p:0,t:"s",fx:true,c:2,q:"¿Cuáles son las variables de salida habituales en sistemas de control continuos?",o:["Temperatura","Presión y caudal","Todas las respuestas son correctas","Nivel"],e:"Temperatura, presión, caudal y nivel son las cuatro variables típicas del control de procesos continuos."},
+{id:"T1-22",p:0,t:"s",q:"En el vídeo del presostato digital, ¿qué salida ofrece el dispositivo ensayado?",o:["Analógica 4-20 mA.","Digital 0-10 V.","Digital 4-20 mA.","Analógica 0-10 V."],e:"La de 4-20 mA es una señal analógica. Las opciones «digital 4-20 mA» y «digital 0-10 V» son trampa."},
+{id:"T1-24",p:0,t:"s",q:"Una válvula que actúa de forma proporcional, abriendo o cerrando ante la señal del controlador, está realizando un control sobre el sistema de tipo:",o:["Continuo","Todo-nada","Discreto","Secuencial"],e:"Si abre de forma proporcional, toma cualquier valor intermedio, así que el control es continuo. Si solo abriera o cerrara del todo, sería todo-nada."},
+{id:"T1-25",p:0,t:"m",q:"La respuesta inicial de un sistema que tiende a desaparecer define a una respuesta:",o:["Pasajera","De comienzo","Transitoria","De inicio"],c:[2],e:"Es la transitoria. La que queda al final, estable, es la permanente."},
+/* ---------- PARTE I ---------- */
+{id:"I-1",p:1,t:"s",fx:true,c:3,q:"Valores de señal por encima de 20 mA indican:",o:["Sobrecorriente","Cortocircuito","Desconexión","Las respuestas a) y b) son correctas"],e:"En 4-20 mA, por encima de 20 mA hay sobrecorriente o cortocircuito. La desconexión (cable roto) da corrientes muy bajas, cerca de 0 mA."},
+{id:"I-2",p:1,t:"s",q:"La salida que ofrecen los termopares es:",o:["En tensión continua","En tensión alterna","En variación de resistencia","En corriente continua"],e:"Efecto Seebeck: el termopar genera unos pocos mV de continua según la diferencia de temperatura entre sus uniones."},
+{id:"I-3",p:1,t:"tf",a:true,q:"La RTD es un elemento pasivo.",e:"No genera energía: cambia su resistencia y necesita una corriente de excitación para poder medirla."},
+{id:"I-4",p:1,t:"tf",a:true,q:"La precisión de un termopar es mejor cuando su transmisor está más cerca del sensor.",e:"La señal es de mV y se estropea con el ruido y la longitud del cable. El transmisor la pasa cerca del sensor a 4-20 mA, que aguanta mejor la distancia."},
+{id:"I-5",p:1,t:"s",q:"El termopar mide:",o:["Temperatura diferencial","Temperatura absoluta","Temperatura media","Tensión alterna proporcional a la diferencia de temperaturas"],e:"Mide la diferencia entre la unión caliente y la fría. Por eso en los ejercicios hay que sumar los mV de la unión fría."},
+{id:"I-6",p:1,t:"tf",a:false,q:"Los termopares son más precisos que las RTDs.",e:"Las RTD son más precisas y estables. El termopar gana en rango (temperaturas muy altas), robustez y rapidez."},
+{id:"I-7",p:1,f:1,t:"s",q:"La corriente de medición de una RTD no debe superar:",o:["5 mA","100 mA","20 mA","1 mA"],e:"Así se evita el autocalentamiento de la RTD, que falsearía la medida. El dato del profesor es 5 mA."},
+{id:"I-8",p:1,t:"s",q:"El termopar más empleado en la industria es el tipo:",o:["K","S","J","T"],e:"El tipo K es barato y tiene un rango amplio (llega a unos 1200 ºC)."},
+{id:"I-9",p:1,t:"tf",a:false,q:"El sensor siempre ofrece una salida de tipo eléctrico.",e:"El sensor puede dar una salida no eléctrica, como la dilatación de un bimetal. El que siempre da salida eléctrica es el transductor."},
+{id:"I-10",p:1,t:"s",q:"Un dispositivo medidor de temperatura mide entre 100 y 300 ºC. ¿Cuál es su rango?",o:["100-300 ºC","200 ºC","100 ºC","300 ºC"],e:"Rango = los dos límites (de 100 a 300 ºC). Span o alcance = la diferencia: 300 − 100 = 200 ºC."},
+{id:"I-11",p:1,t:"tf",a:false,q:"Todos los dispositivos de control pueden operar con señales de tensión o de corriente que detectan fallo.",e:"Solo las señales con cero vivo (4-20 mA) detectan fallo, porque 0 mA significa cable roto. En 0-10 V o 0-20 mA el 0 es un valor válido."},
+{id:"I-12",p:1,f:1,t:"m",q:"Sobre los cables de compensación y de conexión:",o:["El cable de extensión también recibe el nombre de cable de termopar","El cable más económico es el de compensación","Se utilizan tanto para termorresistencias como para termopares","El cable de extensión está realizado en el mismo tipo de material que el elemento sensor","Se utilizan sólo para termopares","Se utilizan sólo para termorresistencias","El cable de compensación está realizado en el mismo tipo de material que el elemento sensor"],c:[0,1,3,4],e:"Solo para termopares. El de extensión es del mismo material que el termopar y también se llama cable de termopar. El de compensación es de otra aleación más barata y se usa con termopares caros (R, S)."},
+{id:"I-13",p:1,t:"s",q:"El cableado de conexión de la RTD incorpora un valor de resistencia. Suponiendo que necesitamos un valor preciso de la medida:",o:["Está en serie con el elemento sensor, y sí afecta significativamente a la medida","Está en serie con el elemento sensor, y no afecta significativamente a la medida","Está en paralelo con el elemento sensor, y no afecta significativamente a la medida","Está en paralelo con el elemento sensor, y sí afecta significativamente a la medida"],e:"La resistencia del cable se suma a la de la RTD. Por eso existen las conexiones a 3 y 4 hilos, que la compensan."},
+{id:"I-14",p:1,t:"tf",a:false,q:"El termistor es un elemento activo.",e:"Es pasivo: cambia su resistencia con la temperatura (NTC o PTC) y necesita alimentación."},
+{id:"I-15",p:1,t:"tf",a:false,q:"Un transductor convierte una señal eléctrica en una señal física.",e:"Es al revés: convierte una magnitud física en una señal eléctrica."},
+{id:"I-16",p:1,t:"s",q:"Un dispositivo medidor de temperatura mide entre 100 y 300 ºC. ¿Cuál es su span?",o:["200 ºC","300 ºC","100-300 ºC","100 ºC"],e:"Span = valor máximo − valor mínimo = 300 − 100 = 200 ºC. El rango sería 100-300 ºC."},
+{id:"I-17",p:1,t:"s",q:"La cadena del sistema de medida es, por orden del proceso al controlador:",o:["Sensor → Transductor → Transmisor","Transductor → Sensor → Transmisor","Transductor → Transmisor → Sensor","Transmisor → Transductor → Sensor"],e:"El sensor capta la magnitud, el transductor la convierte en eléctrica y el transmisor la normaliza (4-20 mA) y la manda al controlador."},
+{id:"I-18",p:1,t:"s",q:"La norma IEC 60751 recomienda un código de colores para los cables de la RTD. Para RTDs de tres hilos este código es:",o:["Dos hilos rojos y uno blanco","Los tres hilos rojos","Los tres hilos blancos","Dos hilos blancos y uno rojo"],e:"A 3 hilos: dos rojos y uno blanco. A 2 hilos: uno rojo y uno blanco. A 4 hilos: dos rojos y dos blancos."},
+{id:"I-19",p:1,t:"tf",a:false,q:"En su construcción, todos los termopares emplean materiales nobles.",e:"Solo los R, S y B (de platino) son nobles. Los J, K, T y E son de metales comunes y más baratos."},
+{id:"I-20",p:1,t:"m",q:"Marca las opciones correctas sobre las RTD:",o:["Se denominan con su valor resistivo a 100 ºC","Están realizadas con aleaciones de varios metales","Su salida es siempre a dos hilos","No suelen ser muy caras","Incrementa su resistencia conforme disminuye la temperatura","Una de las RTD más utilizadas es la Pt100","Disponen siempre de un circuito acondicionador a su salida","Presentan un valor de coeficiente de temperatura positivo y prácticamente lineal"],c:[5,7],e:"Trampas: se nombran por su resistencia a 0 ºC (Pt100 = 100 Ω a 0 ºC), son de metal puro, pueden ser de 2, 3 o 4 hilos, son caras y su resistencia aumenta con la temperatura."},
+{id:"I-21",p:1,t:"s",q:"Si queremos medir una temperatura muy elevada, del orden de los 1200 ºC, ¿qué elemento sensor elegirías?",o:["Un termopar","Una RTD Pt100","Un termistor NTC","Un termostato bimetálico"],e:"Los termopares son los que llegan a temperaturas tan altas. En el Aula Virtual era una pregunta de elegir del desplegable: «Un termopar»."},
+{id:"I-22",p:1,t:"tf",a:false,q:"Para distancias grandes es más fiable una señal en tensión.",e:"Para distancias grandes es más fiable la corriente (4-20 mA): la caída de tensión del cable no le afecta y aguanta mejor el ruido."},
+{id:"I-23",p:1,t:"m",q:"Un termopozo:",o:["Protege a los dispositivos de medición de Tª en ambientes hostiles","Protege exclusivamente a los termopares en ambientes hostiles","Forma parte del elemento sensor","Facilita la sustitución del elemento sensor","Evita la contaminación del elemento sensor"],c:[0,3,4],e:"Protege cualquier sensor de temperatura, no solo termopares. No forma parte del sensor: es una vaina aparte que permite cambiarlo sin abrir el proceso."},
+{id:"I-24",p:1,t:"r",q:"Empareja el tipo de termopar con el tipo de cable de conexión:",pairs:[["TC J","Cable de extensión"],["TC S","Cable de compensación"],["TC R","Cable de compensación"],["TC K","Cable de extensión"]],ch:["Cable de extensión","Cable de compensación"],e:"J y K (metales baratos) usan cable de extensión, del mismo material. R y S (platino, caros) usan cable de compensación, de una aleación más barata."},
+{id:"I-25",p:1,t:"m",q:"Un termostato:",o:["Es un elemento medidor de temperatura","El termostato bimetal puede informar de manera continua de la dilatación que tiene y por lo tanto relacionarla con un valor determinado de temperatura","Es un elemento de control todo-nada","El bimetal se curva hacia el lado del metal que más dilata","Los más empleados son los bimetálicos"],c:[2,4],e:"No mide: abre o cierra un contacto (todo-nada). El bimetal se curva hacia el lado del metal que MENOS dilata."},
+{id:"I-26",p:1,t:"s",q:"¿Cómo se llama el circuito acondicionador típico de una RTD?",o:["Puente de Wheatstone","Amplificador inversor","Compensación de unión fría","Divisor de corriente"],e:"En el Aula Virtual había que escribirlo: «Puente de Wheatstone». La compensación de unión fría es la del termopar."},
+{id:"I-27",p:1,t:"tf",a:false,q:"El termopar es un elemento pasivo.",e:"Es activo: genera su propia tensión (efecto Seebeck) sin alimentación."},
+{id:"I-28",p:1,f:1,t:"m",q:"Este dispositivo mide temperatura entre −55 y 150 ºC y ofrece una salida de entre −0,55 V y 1,5 V. ¿Se trata de un…?",o:["Detector","Captador","Sensor","Transductor"],c:[2,3],e:"Da una tensión continua proporcional (10 mV/ºC), así que es sensor y transductor. Detector y captador dan valores discretos (todo-nada)."},
+{id:"I-29",p:1,t:"s",q:"El tipo de unión de medida de termopar adecuado para medir aire en conductos es el:",o:["Expuesto","Aislado","Puesto a tierra","Compensado"],e:"La unión expuesta responde más rápido. Se usa en gases no corrosivos, como el aire en conductos."},
+{id:"I-30",p:1,t:"m",q:"¿Por qué se suelen emplear mayoritariamente las RTDs de Pt en la industria?",o:["Por su resistencia a la corrosión","Por su relación precio-calidad","Medición de un amplio rango de temperaturas","Su estabilidad con el tiempo"],c:[0,2,3],e:"El platino es caro, así que el precio no es el motivo."},
+{id:"I-31",p:1,f:1,t:"r",q:"Relaciona:",pairs:[["Transmisor","Valor continuo"],["Transductor","Valor analógico y digital"],["Captador","Valor discreto"],["Detector","Valor discreto"],["Sensor","Valor continuo"]],ch:["Valor continuo","Valor discreto","Valor analógico y digital"],e:"Según el profesor: transmisor y sensor, valor continuo; transductor, analógico y digital; captador y detector, valor discreto. Tú cambiaste el transductor y el sensor."},
+{id:"I-32",p:1,t:"s",q:"Toda señal por debajo de 4 mA indica un fallo o error en el sistema:",o:["No, depende del valor","No, en ningún caso","No, sólo indica advertencia","Sí, indica fallo"],e:"Un poco por debajo de 4 mA (por ejemplo 3,8 mA) indica que la medida está bajo rango. Si baja mucho, cerca de 0 mA, sí es fallo o cable roto."},
+{id:"I-33",p:1,t:"s",q:"Los dispositivos que traducen magnitudes físicas en magnitudes eléctricas son los:",o:["Transductores","Sistemas de medida analógicos","Sistemas de medida","Equipos de medida"],e:"Es la definición de transductor: magnitud física → magnitud eléctrica."},
+{id:"I-35",p:1,t:"tf",a:true,q:"El transductor siempre ofrece una salida eléctrica.",e:"Sí. Es la diferencia con el sensor, que puede dar una salida no eléctrica."},
+/* ---------- PARTE II ---------- */
+{id:"II-1",p:2,f:1,t:"tf",a:false,q:"La galga es un elemento activo.",e:"Es pasiva: su resistencia cambia al deformarse y necesita alimentación (va en un puente de Wheatstone)."},
+{id:"II-2",p:2,f:1,t:"n",a:16,u:"puntos por vuelta",q:"El disco de un encoder absoluto tiene 4 pistas (4 bits). ¿Cuál es su resolución?",e:"Resolución = 2^nº de pistas = 2^4 = <b>16 puntos por vuelta</b> (360 / 16 = 22,5º cada uno). Pon siempre la unidad: en el Aula Virtual te quitó medio punto por no ponerla."},
+{id:"II-3",p:2,t:"s",fx:true,c:0,q:"¿Las entradas de los RI o los PLCs a los que está conectado el encoder incremental necesitan poder admitir la frecuencia máxima que les llega?",o:["Sí, mientras las entradas sean digitales","No, mientras las entradas sean analógicas","No, mientras las entradas sean digitales","Sí, mientras las entradas sean analógicas"],e:"Los pulsos del encoder entran por entradas digitales. Si no admiten la frecuencia máxima, se pierden pulsos."},
+{id:"II-4",p:2,t:"m",q:"El tiempo transcurrido entre la emisión de un ultrasonido y su recepción recibe el nombre de:",o:["ToF","Time of flight","Tiempo de vuelo","ToN"],c:[0,1,2],e:"ToF = Time of Flight = tiempo de vuelo. ToN es un temporizador a la conexión, no tiene nada que ver."},
+{id:"II-5",p:2,t:"s",q:"Con la utilización de los engranajes conseguimos modificar…",o:["La velocidad angular y el torque","La velocidad lineal y la potencia","La frecuencia y la tensión","La posición y la resolución"],e:"Un engranaje baja la velocidad angular y sube el par (torque), o al revés. En el Aula Virtual eran dos huecos: [angular] y [torque]."},
+{id:"II-6",p:2,t:"tf",a:true,q:"El cristal piezoeléctrico es un dispositivo activo.",e:"Genera carga eléctrica al deformarse (efecto piezoeléctrico), sin alimentación."},
+{id:"II-7",p:2,t:"tf",a:false,q:"Los sensores de medida de nivel sólo detectan el nivel en fluidos pero no en sólidos.",e:"También miden nivel de sólidos, como grano o áridos en un silo."},
+{id:"II-8",p:2,f:1,t:"m",q:"¿Por qué suelen utilizarse las galgas en parejas?",o:["Para registrar más tipos de esfuerzos","Para compensar el efecto de la temperatura","Para conseguir más precisión y sensibilidad","Para conseguir un mayor valor de tensión de salida"],c:[1,2],e:"Dos galgas en el puente anulan el efecto de la temperatura y suben la sensibilidad. Te faltó marcar una de las dos."},
+{id:"II-9",p:2,t:"m",q:"Respecto de las dinamos:",o:["Es un generador de tensión continua","Cuando se utilizan para medir velocidad se llaman tacómetros","Puede medir también sentido de giro","Pueden medir también posición angular"],c:[0,1,2],e:"El valor de la tensión da la velocidad y su polaridad, el sentido de giro. No da la posición angular."},
+{id:"II-10",p:2,t:"tf",a:true,q:"Los encoders incrementales pueden detectar un flanco o dos flancos.",e:"Si se cuentan los dos flancos de cada pulso (subida y bajada), la resolución se dobla."},
+{id:"II-11",p:2,t:"tf",a:false,q:"Un mismo encoder no puede implementar la detección de un sólo flanco y de dos flancos.",e:"Sí puede: contar uno o dos flancos lo decide el equipo que lee los pulsos."},
+{id:"II-12",p:2,t:"m",q:"Los encoders incrementales pueden proporcionar información para poder obtener:",o:["La posición angular","La velocidad de giro","El sentido de giro","El nº de vueltas completas"],c:[0,1,2,3],e:"Todas. Contando pulsos sacas la posición; con los pulsos por segundo, la velocidad; con el desfase de 90º entre A y B, el sentido; y con el canal Z (Index), las vueltas."},
+{id:"II-13",p:2,t:"s",q:"Los encoders absolutos que no pueden ofrecer información sobre el nº de vueltas dadas son los:",o:["Monovuelta","Multivuelta","Incrementales","Ópticos"],e:"El monovuelta solo conoce la posición dentro de una vuelta. El multivuelta también cuenta las vueltas."},
+{id:"II-14",p:2,t:"s",q:"Cuando se requieren mediciones de caudal de precisión, se recurre a los medidores:",o:["Másicos","Volumétricos","De presión diferencial","De turbina"],e:"Los másicos (por ejemplo, Coriolis) miden directamente la masa, sin depender de la presión ni de la temperatura."},
+{id:"II-15",p:2,t:"s",q:"Todos los encoders absolutos generan:",o:["Un código binario","Un código binario en código Gray","Un código binario BCD","Un tren de impulsos"],e:"Trampa de «todos»: unos usan Gray y otros BCD, pero todos dan un código binario. El tren de impulsos es del incremental."},
+{id:"II-16",p:2,t:"s",fx:true,c:3,q:"Las galgas extensiométricas pueden verse sometidas a esfuerzos de:",o:["Tracción y flexión","Tracción y compresión","Flexión y torsión","Todas las respuestas son correctas"],e:"Tracción, compresión, flexión y torsión: depende de cómo se peguen."},
+{id:"II-17",p:2,t:"m",q:"Sobre la tensión de offset:",o:["Puede corregirse ajustando alguna de las resistencias del puente","Surge por errores en el funcionamiento de las galgas extensiométricas","Puede corregirse a través de software","Aparece en los circuitos de acondicionamiento como el puente de Wheatstone","Es la tensión que aparece cuando el puente está en carga"],c:[0,2,3],e:"Es la tensión que da el puente en reposo, sin carga, por pequeñas diferencias entre las resistencias. No es un fallo de la galga."},
+{id:"II-18",p:2,t:"s",q:"Cuando hablamos de salida NPN o PNP nos estamos refiriendo a encoders:",o:["Incrementales","Absolutos","Monovuelta","Multivuelta"],e:"NPN y PNP son salidas de transistor que dan los pulsos del encoder incremental."},
+{id:"II-20",p:2,f:1,t:"tf",a:true,q:"Las tensiones de alimentación para encoders OMRON con salidas NPN y PNP son distintas.",e:"Verdadero según el material del profesor: en los encoders OMRON del tema, la alimentación cambia según el tipo de salida."},
+{id:"II-21",p:2,f:1,t:"n",a:195,u:"º",q:"Calcula la posición angular de un encoder incremental de doble flanco de 60 ventanas si desde la posición Index se han generado 65 pulsos.",e:"Doble flanco: 2 × 60 = 120 pulsos por vuelta. Resolución = 360 / 120 = 3º. Posición = 65 × 3 = <b>195º</b>. Pon la unidad: te quitó medio punto por no ponerla."},
+{id:"II-22",p:2,f:1,t:"n",a:3,u:"º",q:"Determina la resolución de un encoder de dos flancos que dispone de 60 ventanas.",e:"Resolución = 360 / (2 × 60) = <b>3º</b>. En el Aula Virtual el enunciado también preguntaba la posición, pero la respuesta que pedía era la resolución: 3º."},
+{id:"II-23",p:2,t:"tf",a:true,q:"Los medidores de presión diferencial son medidores de tipo volumétrico.",e:"Placa de orificio, Venturi o tubo de Pitot sacan el caudal volumétrico a partir de una caída de presión."},
+{id:"II-25",p:2,t:"r",q:"Relaciona las salidas del encoder con su color de cable:",pairs:[["Canal A","Negro"],["Canal B","Blanco"],["Canal Z","Naranja"],["+V","Marrón"],["0V","Azul"]],ch:["Negro","Blanco","Naranja","Marrón","Azul"],e:"Truco: marrón es + y azul es 0 V, igual que en los sensores de 3 hilos. Después, A negro, B blanco y Z naranja."},
+{id:"II-26",p:2,t:"m",q:"Sobre el cristal piezoeléctrico:",o:["Precisan de circuitos acondicionadores de señal","Su salida es del valor suficiente como para no precisar de amplificadores","Presentan una señal de salida muy débil","Su señal de salida es de tipo resistivo"],c:[0,2],e:"Da una carga muy pequeña, así que necesita acondicionamiento y amplificación. No es resistivo: genera carga."},
+/* ---------- PARTE III ---------- */
+{id:"III-2",p:3,f:1,t:"tf",a:true,q:"Filtros pasivos y activos atenúan las señales.",e:"Los dos atenúan las frecuencias que no interesan. El activo, además, puede amplificar las que deja pasar."},
+{id:"III-4",p:3,t:"m",q:"Los circuitos acondicionadores de señal NO realizan:",o:["Generación de energía o alimentación","Preparar la señal antes de que sea procesada","Conversión de una magnitud física en otra","Almacenamiento o registro de datos","Filtrado"],c:[0,2,3],e:"Convertir una magnitud física en otra lo hace el transductor, y almacenar datos, el registrador o el PLC. El acondicionador prepara la señal: amplifica, filtra, linealiza, aísla."},
+{id:"III-6",p:3,f:1,t:"n",a:10000,u:"Ω",q:"Determina el valor de RX para que la tensión de offset de un puente de Wheatstone sea 0 V. R1 = 100 Ω; R2 = R3 = 1000 Ω.",e:"Equilibrio: R1 · Rx = R2 · R3, así que Rx = 1000 · 1000 / 100 = <b>10 000 Ω</b>. Tú pusiste 100 Ω."},
+{id:"III-7",p:3,t:"m",q:"Dentro de los AO, ¿qué define k?",o:["La amplificación","La ganancia","El factor de multiplicación del AO","El factor de relación de la salida con respecto a la entrada"],c:[0,1,2,3],e:"Todas son correctas: k es la ganancia, es decir, cuántas veces la salida es mayor que la entrada (Vs = k · Ve)."},
+{id:"III-8",p:3,f:1,t:"tf",a:true,q:"Los filtros activos se hacen con resistencias y condensadores.",e:"Sí, con R y C, más un elemento activo (el AO). Los pasivos usan solo R y C, sin alimentación. Esta la fallaste."},
+{id:"III-9",p:3,t:"g",g:"hist",q:"Identifica el tipo de error que indica la gráfica:",o:["Error de histéresis","Error de no linealidad","Error de multiplicación o de span","Error de cero (offset)"],e:"Hay dos curvas distintas, una al subir y otra al bajar la entrada: es histéresis. El mismo valor de entrada da dos salidas según de dónde vengas."},
+{id:"III-10",p:3,t:"tf",a:false,q:"Un sensor estará bien calibrado sólo cuando su error sea 0.",e:"Está bien calibrado si su error queda dentro de la tolerancia del fabricante. El error 0 no existe."},
+{id:"III-11",p:3,t:"o",q:"Ordena los pasos para calibrar correctamente un instrumento analógico:",steps:["Proporcionar una señal de entrada que se corresponda con el valor mínimo de su rango de medida","Proporcionar una señal de entrada que se corresponda con el valor máximo de su rango de medida","Repetir los dos pasos anteriores tantas veces como sea necesario","Realizar un ajuste de linealidad si es posible","Comprobar que el funcionamiento es correcto en diferentes puntos del rango de medida"],e:"Primero el cero (mínimo), luego el span (máximo), y se repiten porque se afectan entre sí. Después, la linealidad y la comprobación en varios puntos."},
+{id:"III-12",p:3,t:"g",g:"nolin",q:"Identifica el tipo de error que indica la gráfica:",o:["Error de no linealidad","Error de histéresis","Error de multiplicación o de span","Error de cero (offset)"],e:"La curva real coincide con la ideal en los extremos, pero se curva en medio: es no linealidad."},
+{id:"III-13",p:3,t:"g",g:"span",q:"Identifica el tipo de error que indica la gráfica:",o:["Error de multiplicación o de span","Error de no linealidad","Error de histéresis","Error de cero (offset)"],e:"Empieza en el mismo cero, pero tiene otra pendiente, así que el error crece con la entrada: es error de multiplicación o de span. En el error de cero la recta va desplazada en paralelo."},
+{id:"III-14",p:3,t:"tf",a:false,q:"El puente de Wheatstone sólo se emplea en DC.",e:"También puede alimentarse en alterna (puentes de alterna)."},
+{id:"III-15",p:3,t:"s",fx:true,c:1,q:"El puente de Wheatstone dispone de:",o:["Un divisor de tensión","Dos divisores de tensión","Cuatro divisores de tensión","Todas las respuestas son incorrectas"],e:"Dos ramas, y cada una es un divisor de tensión: VA y VB. La salida es VA − VB."},
+{id:"III-16",p:3,t:"s",fx:true,c:3,q:"¿Dónde podemos encontrar circuitos acondicionadores de señal?",o:["En el propio transductor","Como módulos acondicionadores para montaje en carril DIN","En los propios dispositivos de procesamiento de las señales","Todas las respuestas son correctas"],e:"Los tres sitios son correctos."},
+{id:"III-17",p:3,t:"tf",a:true,q:"Los filtros pasivos se hacen con resistencias y condensadores.",e:"Sí, con R y C (también bobinas) y sin alimentación."},
+{id:"III-18",p:3,f:1,t:"m",q:"El puente de Wheatstone suele emplearse para sensores como:",o:["RTD","Termistores","Termopares","Galgas extensiométricas","Células de carga"],c:[0,1,3,4],e:"Se usa con todos los sensores resistivos. El termopar no varía su resistencia (genera tensión), así que no va en puente."}
+];
+
+/* ===================== UTILIDADES ===================== */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const fmt=n=>(Math.round(n*100)/100).toString().replace(".",",");
+const L="abcdefgh";
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const settings=Object.assign({part:"all",n:"20",src:"all",pen:true},store.get("smr2-set",{}));
+
+function figure(kind){
+  const ax=`<line x1="34" y1="146" x2="214" y2="146" stroke="var(--muted)" stroke-width="1.5"/><line x1="34" y1="146" x2="34" y2="10" stroke="var(--muted)" stroke-width="1.5"/>
+  <text x="214" y="160" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Sans,sans-serif">Entrada</text>
+  <text x="8" y="20" font-size="11" fill="var(--muted)" font-family="IBM Plex Sans,sans-serif" transform="rotate(-90 14 70)">Salida</text>
+  <line x1="34" y1="146" x2="204" y2="22" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  const real={
+    hist:`<path d="M34 146 Q140 132 204 22" fill="none" stroke="var(--accent)" stroke-width="2.5"/><path d="M34 146 Q90 40 204 22" fill="none" stroke="var(--amber)" stroke-width="2.5"/>
+          <text x="150" y="120" font-size="11" fill="var(--accent)" font-family="IBM Plex Sans,sans-serif">subiendo</text><text x="62" y="58" font-size="11" fill="var(--amber)" font-family="IBM Plex Sans,sans-serif">bajando</text>`,
+    nolin:`<path d="M34 146 Q70 50 204 22" fill="none" stroke="var(--accent)" stroke-width="2.5"/><text x="110" y="52" font-size="11" fill="var(--accent)" font-family="IBM Plex Sans,sans-serif">real</text>`,
+    span:`<line x1="34" y1="146" x2="204" y2="72" stroke="var(--accent)" stroke-width="2.5"/><text x="160" y="104" font-size="11" fill="var(--accent)" font-family="IBM Plex Sans,sans-serif">real</text>`
+  }[kind];
+  return `<div class="fig"><svg viewBox="0 0 220 166" role="img" aria-label="Gráfica entrada-salida: discontinua la ideal, en color la real">${ax}${real}<text x="168" y="16" font-size="11" fill="var(--muted)" font-family="IBM Plex Sans,sans-serif">- - ideal</text></svg></div>`;
+}
+
+/* ===================== CONSTRUIR INTENTO ===================== */
+function build(q){
+  const it={q};
+  if(q.t==="s"||q.t==="g"){
+    if(q.fx){it.opts=q.o;it.right=q.c;}
+    else{const ord=shuffle(q.o.map((_,k)=>k));it.opts=ord.map(k=>q.o[k]);it.right=ord.indexOf(0);}
+  }else if(q.t==="m"){
+    const ord=shuffle(q.o.map((_,k)=>k));it.opts=ord.map(k=>q.o[k]);it.ok=ord.map((k,pos)=>q.c.includes(k)?pos:-1).filter(x=>x>=0);
+  }else if(q.t==="r"){it.ch=shuffle(q.ch);it.rows=shuffle(q.pairs.map((_,k)=>k));}
+  else if(q.t==="o"){it.rows=shuffle(q.steps.map((_,k)=>k));}
+  return it;
+}
+function hint(t){return {s:"Seleccione una:",g:"Seleccione una:",tf:"Verdadero o falso:",m:"Seleccione una o más de una:",r:"Elige la pareja de cada fila:",o:"Pon el número de orden de cada paso:",n:"Escribe el número (la unidad ya está puesta):"}[t];}
+function itemHTML(it,i){
+  const q=it.q,P="q"+i;let body="";
+  if(q.t==="s"||q.t==="g"||q.t==="tf"){
+    const opts=q.t==="tf"?["Verdadero","Falso"]:it.opts;
+    body=`<div class="opts">${opts.map((o,k)=>`<label class="opt"><input type="radio" name="${P}" id="${P}_${k}" value="${k}">${q.t==="tf"?"":`<span class="l">${L[k]}.</span>`}<span>${esc(o)}</span></label>`).join("")}</div>`;
+  }else if(q.t==="m"){
+    body=`<div class="opts">${it.opts.map((o,k)=>`<label class="opt"><input type="checkbox" name="${P}" id="${P}_${k}" value="${k}"><span class="l">${L[k]}.</span><span>${esc(o)}</span></label>`).join("")}</div>`;
+  }else if(q.t==="r"){
+    body=`<div class="rows">${it.rows.map((k,j)=>`<div class="row" id="${P}row${j}"><span>${esc(q.pairs[k][0])}</span><select id="${P}_${j}" aria-label="Pareja de ${esc(q.pairs[k][0])}"><option value="">Elegir…</option>${it.ch.map(c=>`<option>${esc(c)}</option>`).join("")}</select></div>`).join("")}</div>`;
+  }else if(q.t==="o"){
+    body=`<div class="rows">${it.rows.map((k,j)=>`<div class="row" id="${P}row${j}"><span>${esc(q.steps[k])}</span><select id="${P}_${j}" aria-label="Orden del paso"><option value="">Nº</option>${q.steps.map((_,x)=>`<option>${x+1}</option>`).join("")}</select></div>`).join("")}</div>`;
+  }else if(q.t==="n"){
+    body=`<div class="num" id="${P}box"><input id="${P}_n" inputmode="decimal" autocomplete="off" aria-label="Respuesta"><span>${esc(q.u)}</span></div>`;
+  }
+  return `<div class="q" id="${P}"><div class="q-h"><span class="q-n">Pregunta ${i+1} · ${SHORT[q.p]}</span>${q.f?'<span class="tag">La fallaste en el Aula Virtual</span>':""}<span id="${P}pts"></span></div>
+  <div class="q-t">${esc(q.q)}</div>${q.t==="g"?figure(q.g):""}<p class="q-i">${hint(q.t)}</p>${body}${["m","r","o","n"].includes(q.t)?`<button class="btn sec chkb" id="${P}chk">Comprobar</button>`:""}</div>`;
+}
+function parseNum(s){
+  s=String(s).trim().replace(/\s/g,"");
+  if(/^-?\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,"");
+  s=s.replace(",",".").replace(/[^0-9.\-]/g,"");
+  return s===""?NaN:parseFloat(s);
+}
+function grade(it,i,pen){
+  const q=it.q,P="q"+i,box=document.getElementById(P);let pts=0,answered=true;
+  if(q.t==="s"||q.t==="g"||q.t==="tf"){
+    const sel=box.querySelector(`input[name="${P}"]:checked`);const v=sel?+sel.value:-1;
+    const right=q.t==="tf"?(q.a?0:1):it.right;
+    box.querySelectorAll(".opt").forEach((l,k)=>{l.querySelector("input").disabled=true;if(k===right)l.classList.add("right");else if(k===v)l.classList.add("wrong");});
+    if(v<0)answered=false;else if(v===right)pts=1;else pts=(pen&&q.t!=="tf")?-1/3:0;
+  }else if(q.t==="m"){
+    let hit=0,bad=0,any=false;
+    box.querySelectorAll(".opt").forEach((l,k)=>{const inp=l.querySelector("input");inp.disabled=true;const ok=it.ok.includes(k);
+      if(inp.checked){any=true;if(ok){hit++;l.classList.add("right");}else{bad++;l.classList.add("wrong");}}else if(ok)l.classList.add("miss");});
+    answered=any;pts=Math.max(0,(hit-bad)/it.ok.length);
+  }else if(q.t==="r"||q.t==="o"){
+    let ok=0,any=false;
+    it.rows.forEach((k,j)=>{const s=document.getElementById(`${P}_${j}`);s.disabled=true;if(s.value)any=true;
+      const want=q.t==="r"?q.pairs[k][1]:String(k+1);const row=document.getElementById(`${P}row${j}`);
+      if(s.value===want){ok++;row.classList.add("right");}else{row.classList.add("wrong");row.insertAdjacentHTML("beforeend",`<small>Correcta: ${esc(want)}</small>`);}});
+    answered=any;pts=ok/it.rows.length;
+  }else if(q.t==="n"){
+    const inp=document.getElementById(P+"_n");inp.disabled=true;const v=parseNum(inp.value);
+    answered=!isNaN(v);const good=answered&&Math.abs(v-q.a)<=Math.max(Math.abs(q.a)*0.01,0.01);
+    pts=good?1:0;document.getElementById(P+"box").classList.add(good?"right":"wrong");
+  }
+  const pb=document.getElementById(P+"pts");pb.className="pts "+(pts>=1?"ok":pts>0?"mid":"ko");pb.textContent=(pts>0?"+":"")+fmt(pts);
+  const d=document.createElement("div");d.className="expl "+(pts>=1?"ok":"ko");
+  const head=!answered?"Sin contestar. ":pts>=1?"Correcta. ":pts>0?"Parcialmente correcta. ":"Incorrecta. ";
+  d.innerHTML=`<b>${head}</b>${q.t==="tf"?`La respuesta correcta es «${q.a?"Verdadero":"Falso"}». `:q.t==="n"?`La respuesta correcta es ${fmt(q.a)} ${esc(q.u)}. `:""}${q.e}`;
+  box.appendChild(d);
+  return pts;
+}
+
+/* ===================== VISTA TEST ===================== */
+let view="test";
+const inPart=(q,part)=>part==="all"||(part==="t2"&&q.p>0)||String(q.p)===part;
+const PART_OPTS='<option value="all">Temas 1 y 2</option><option value="0">Tema 1</option><option value="t2">Tema 2 completo</option><option value="1">Tema 2 · Parte I</option><option value="2">Tema 2 · Parte II</option><option value="3">Tema 2 · Parte III</option>';
+function pool(){
+  let p=Q.filter(q=>inPart(q,settings.part));
+  if(settings.src==="aula")p=p.filter(q=>q.f);
+  if(settings.src==="mine"){const f=store.get("smr2-fallos",[]);p=p.filter(q=>f.includes(q.id));}
+  return p;
+}
+function renderTest(){
+  const p=pool();const n=settings.n==="all"?p.length:Math.min(+settings.n,p.length);
+  const items=shuffle(p).slice(0,n).map(build);
+  const nf=store.get("smr2-fallos",[]).length;
+  app.innerHTML=`<div class="panel"><div class="ctrls">
+    <label class="field" for="sPart">Tema<select id="sPart">${PART_OPTS}</select></label>
+    <label class="field" for="sSrc">Preguntas<select id="sSrc"><option value="all">Todas</option><option value="aula">Las que fallé en el Aula Virtual</option><option value="mine">Mis fallos aquí (${nf})</option></select></label>
+    <label class="field" for="sN">Cuántas<select id="sN"><option value="10">10</option><option value="20">20</option><option value="30">30</option><option value="all">Todas</option></select></label>
+    <button class="btn sec" id="newT">Nuevo intento</button></div>
+    <label class="chk" for="sPen"><input type="checkbox" id="sPen" ${settings.pen?"checked":""}> Restar −0,33 por fallo en las de una opción, como en el Aula Virtual</label></div>
+    <div id="res"></div>
+    ${items.length?items.map(itemHTML).join("")+`<div class="live" id="live"><span id="liveTxt">Contestadas <b>0/${items.length}</b> · Puntos <b>0</b></span><button class="btn" id="corr">Terminar y ver nota</button></div>`:'<p class="empty">No hay preguntas con este filtro. Si eliges «Mis fallos aquí», primero haz algún intento.</p>'}`;
+  $("#sPart").value=settings.part;$("#sSrc").value=settings.src;$("#sN").value=settings.n;
+  const save=()=>store.set("smr2-set",settings);
+  $("#sPart").onchange=e=>{settings.part=e.target.value;save();renderTest();};
+  $("#sSrc").onchange=e=>{settings.src=e.target.value;save();renderTest();};
+  $("#sN").onchange=e=>{settings.n=e.target.value;save();renderTest();};
+  $("#sPen").onchange=e=>{settings.pen=e.target.checked;save();};
+  $("#newT").onclick=()=>{renderTest();scrollTo(0,0);};
+  if(!items.length)return;
+  const res=items.map(()=>null);let finished=false;
+  const doGrade=i=>{
+    if(res[i]!==null)return;
+    res[i]=grade(items[i],i,settings.pen);
+    const b=document.getElementById("q"+i+"chk");if(b)b.remove();
+    let fallos=store.get("smr2-fallos",[]);const id=items[i].q.id;
+    if(res[i]<1){if(!fallos.includes(id))fallos.push(id);}else fallos=fallos.filter(x=>x!==id);
+    store.set("smr2-fallos",fallos);
+    const done=res.filter(x=>x!==null),s=done.reduce((a,b)=>a+b,0);
+    $("#liveTxt").innerHTML=`Contestadas <b>${done.length}/${items.length}</b> · Puntos <b>${fmt(s)}</b>`;
+    if(done.length===items.length)finish();
+  };
+  items.forEach((it,i)=>{
+    const P="q"+i,t=it.q.t;
+    if(t==="s"||t==="g"||t==="tf")document.querySelectorAll(`input[name="${P}"]`).forEach(inp=>inp.onchange=()=>doGrade(i));
+    else{document.getElementById(P+"chk").onclick=()=>doGrade(i);
+      if(t==="n")document.getElementById(P+"_n").onkeydown=e=>{if(e.key==="Enter")doGrade(i);};}
+  });
+  const finish=()=>{
+    if(finished)return;finished=true;
+    items.forEach((_,i)=>{if(res[i]===null)doGrade(i);});
+    let sum=0;const weak={};
+    items.forEach((it,i)=>{sum+=res[i];if(res[i]<1)weak[it.q.p]=(weak[it.q.p]||0)+1;});
+    const nota=Math.max(0,sum)/items.length*10;
+    const w=Object.entries(weak).sort((a,b)=>b[1]-a[1]);
+    const wt=w.length?"Repasa sobre todo: "+w.slice(0,2).map(([p,c])=>`${PARTS[p]} (${c} fallo${c>1?"s":""})`).join(" y ")+".":"Sin fallos.";
+    $("#res").innerHTML=`<div class="score"><div class="n ${nota>=5?"pass":"fail"}">${fmt(Math.round(nota*100)/100)}<small>/10</small></div><div><b>${fmt(Math.max(0,sum))} de ${items.length} puntos</b><br><span class="note">${wt} Las falladas quedan en «Mis fallos aquí».</span></div></div>`;
+    $("#corr").outerHTML='<button class="btn" id="again">Hacer otro intento</button>';
+    $("#again").onclick=()=>{renderTest();scrollTo(0,0);};
+    const h=store.get("smr2-hist",[]);h.unshift({d:Date.now(),part:settings.part,src:settings.src,nota,pts:Math.max(0,sum),n:items.length});store.set("smr2-hist",h.slice(0,50));
+    scrollTo({top:0,behavior:"smooth"});
+  };
+  $("#corr").onclick=finish;
+}
+
+/* ===================== VISTA REPASO ===================== */
+let repPart="all",repAula=false;
+function answerHTML(q){
+  if(q.t==="tf")return q.a?"Verdadero":"Falso";
+  if(q.t==="s"||q.t==="g")return esc(q.o[q.fx?q.c:0]);
+  if(q.t==="m")return `<ul>${q.c.map(k=>`<li>${esc(q.o[k])}</li>`).join("")}</ul>`;
+  if(q.t==="r")return `<ul>${q.pairs.map(([a,b])=>`<li>${esc(a)} → ${esc(b)}</li>`).join("")}</ul>`;
+  if(q.t==="o")return `<ol>${q.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`;
+  if(q.t==="n")return `${fmt(q.a)} ${esc(q.u)}`;
+}
+function renderRep(){
+  const list=Q.filter(q=>inPart(q,repPart)&&(!repAula||q.f));
+  let html=`<div class="panel"><div class="ctrls"><label class="field" for="rPart">Tema<select id="rPart">${PART_OPTS}</select></label></div>
+  <label class="chk" for="rAula"><input type="checkbox" id="rAula" ${repAula?"checked":""}> Solo las que fallé en el Aula Virtual</label><p class="note">${list.length} preguntas. Léelas antes de hacer el test.</p></div>`;
+  let cur=0;
+  list.forEach(q=>{
+    if(q.p!==cur){cur=q.p;html+=`<h2>${PARTS[q.p]}</h2>`;}
+    html+=`<div class="q"><div class="q-h"><span class="q-n">${SHORT[q.p]} · Pregunta ${q.id.split("-")[1]}</span>${q.f?'<span class="tag">La fallaste en el Aula Virtual</span>':""}</div>
+    <div class="q-t">${esc(q.q)}</div>${q.t==="g"?figure(q.g):""}<div class="ans">${answerHTML(q)}</div><div class="expl">${q.e}</div></div>`;
+  });
+  app.innerHTML=html;
+  $("#rPart").value=repPart;
+  $("#rPart").onchange=e=>{repPart=e.target.value;renderRep();};
+  $("#rAula").onchange=e=>{repAula=e.target.checked;renderRep();};
+}
+
+/* ===================== VISTA HISTORIAL ===================== */
+function renderHist(){
+  const h=store.get("smr2-hist",[]);
+  const pn={all:"Temas 1 y 2",0:"Tema 1",t2:"Tema 2",1:"T2 · Parte I",2:"T2 · Parte II",3:"T2 · Parte III"},sn={all:"Todas",aula:"Falladas en el Aula",mine:"Mis fallos"};
+  app.innerHTML=`<h2>Mis intentos</h2><div class="hist">${h.length?`<table><thead><tr><th>Fecha</th><th>Parte</th><th>Preguntas</th><th>Puntos</th><th>Nota</th></tr></thead><tbody>${h.map(r=>`<tr><td>${new Date(r.d).toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</td><td>${pn[r.part]||"—"}</td><td>${sn[r.src]||"—"}</td><td class="m">${fmt(r.pts)}/${r.n}</td><td class="m ${r.nota>=5?"pass":"fail"}">${fmt(Math.round(r.nota*100)/100)}</td></tr>`).join("")}</tbody></table>`:'<p class="empty">Aún no has hecho ningún intento. Se guardan en este navegador.</p>'}</div>
+  <p class="note" style="margin-top:12px">Tienes ${store.get("smr2-fallos",[]).length} preguntas en «Mis fallos aquí». Se quitan solas cuando las aciertas.</p>
+  <button class="btn sec" id="clr" style="margin-top:12px">Borrar historial y fallos</button><span id="clrMsg" class="note" style="margin-left:10px"></span>`;
+  let armed=false;
+  $("#clr").onclick=()=>{if(!armed){armed=true;$("#clr").textContent="Pulsa otra vez para borrar";return;}store.set("smr2-hist",[]);store.set("smr2-fallos",[]);renderHist();$("#clrMsg").textContent="Borrado.";};
+}
+
+/* ===================== PESTAÑAS ===================== */
+function show(v){view=v;document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.v===v)));
+  if(v==="test")renderTest();else if(v==="rep")renderRep();else renderHist();}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{show(t.dataset.v);scrollTo(0,0);});
+show("test");
+</script>
+
+</body>
+</html>
